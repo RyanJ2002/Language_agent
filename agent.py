@@ -60,7 +60,7 @@ _由語言學習 Agent 自動生成_"""
 def call_gemini(prompt: str) -> str:
     payload = json.dumps({
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.7, "maxOutputTokens": 1200}
+        "generationConfig": {"temperature": 0.7, "maxOutputTokens": 3000}
     }).encode("utf-8")
 
     req = urllib.request.Request(
