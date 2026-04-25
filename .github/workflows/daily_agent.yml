@@ -11,7 +11,6 @@ env:
 jobs:
   send-daily-news:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4.2.2
@@ -21,7 +20,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Debug check secrets        # ← 加在這裡
+      - name: Debug check secrets
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
@@ -36,3 +35,15 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: python agent.py
+
+  keep-alive:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - name: Keep workflow alive
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git commit --allow-empty -m "chore: keep workflow alive [skip ci]"
+          git push
