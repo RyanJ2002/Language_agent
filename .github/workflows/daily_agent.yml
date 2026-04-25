@@ -5,6 +5,9 @@ on:
     - cron: "0 1 * * *"
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   send-daily-news:
     runs-on: ubuntu-latest
@@ -18,13 +21,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run language agent
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: python agent.py
-
-      - name: Debug check secrets
+      - name: Debug check secrets        # ← 加在這裡
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
@@ -33,3 +30,9 @@ jobs:
           else
             echo "✅ GEMINI_API_KEY 長度：${#GEMINI_API_KEY}"
           fi
+
+      - name: Run language agent
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python agent.py
