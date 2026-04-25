@@ -2,9 +2,8 @@ name: 每日語言學習 Agent
 
 on:
   schedule:
-    # 每天 UTC 01:00 = 台灣時間 09:00
     - cron: "0 1 * * *"
-  workflow_dispatch: # 允許手動觸發，測試用
+  workflow_dispatch:
 
 jobs:
   send-daily-news:
@@ -12,10 +11,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: "3.12"
 
