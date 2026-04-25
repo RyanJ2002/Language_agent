@@ -80,7 +80,24 @@ def call_gemini(prompt: str) -> str:
 
 
 def send_to_discord(message: str) -> None:
-    chunks = [message[i:i+1990] for i in range(0, len(message), 1990)]
+    # 先嘗試整則發送
+    if len(message) <= 1990:
+        chunks = [message]
+    else:
+        # 依照空行分割段落，再重新組合不超過 1990 字元的 chunk
+        paragraphs = message.split("\n\n")
+        chunks = []
+        current = ""
+        for para in paragraphs:
+            if len(current) + len(para) + 2 <= 1990:
+                current += ("\n\n" if current else "") + para
+            else:
+                if current:
+                    chunks.append(current)
+                current = para
+        if current:
+            chunks.append(current)
+
     for chunk in chunks:
         payload = json.dumps({"content": chunk}).encode("utf-8")
         req = urllib.request.Request(
@@ -101,6 +118,10 @@ def send_to_discord(message: str) -> None:
 
         if status not in (200, 204):
             raise RuntimeError(f"Discord webhook returned {status}")
+
+        # Discord rate limit 保護，多則訊息間隔 1 秒
+        import time
+        time.sleep(1)
 
 
 def main():
