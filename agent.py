@@ -86,7 +86,10 @@ def send_to_discord(message: str) -> None:
         req = urllib.request.Request(
             DISCORD_WEBHOOK_URL,
             data=payload,
-            headers={"Content-Type": "application/json"},
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": "DiscordBot (language-agent, 1.0)"
+            },
             method="POST"
         )
         try:
