@@ -1,0 +1,26 @@
+name: 每日語言學習 Agent
+
+on:
+  schedule:
+    # 每天 UTC 01:00 = 台灣時間 09:00
+    - cron: "0 1 * * *"
+  workflow_dispatch: # 允許手動觸發，測試用
+
+jobs:
+  send-daily-news:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run language agent
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python agent.py
