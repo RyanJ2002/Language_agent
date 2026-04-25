@@ -10,7 +10,7 @@ DISCORD_WEBHOOK_URL = os.environ["DISCORD_WEBHOOK_URL"]
 # 使用穩定版本的模型名稱
 GEMINI_URL = (
     "https://generativelanguage.googleapis.com/v1beta/models/"
-    "gemini-1.5-flash-latest:generateContent?key=" + GEMINI_API_KEY
+    "gemini-2.5-flash:generateContent?key=" + GEMINI_API_KEY
 )
 
 today = datetime.now().strftime("%Y年%m月%d日")
