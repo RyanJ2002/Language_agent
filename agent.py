@@ -7,9 +7,10 @@ from datetime import datetime
 GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 DISCORD_WEBHOOK_URL = os.environ["DISCORD_WEBHOOK_URL"]
 
+# 使用穩定版本的模型名稱
 GEMINI_URL = (
     "https://generativelanguage.googleapis.com/v1beta/models/"
-    "gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY
+    "gemini-1.5-flash-latest:generateContent?key=" + GEMINI_API_KEY
 )
 
 today = datetime.now().strftime("%Y年%m月%d日")
@@ -21,7 +22,7 @@ PROMPT = f"""今天是 {today}（星期{weekday}）。
 
 你是每日語言學習 Agent。請幫我從以下來源各搜尋一則今日最新科技或時事新聞：
 - 英語：The Verge (theverge.com)
-- 日語：NHK Web (www3.nhk.or.jp)  
+- 日語：NHK Web (www3.nhk.or.jp)
 - 韓語：朝鮮日報 (chosun.com)
 
 請嚴格按照以下格式輸出，不要任何額外說明或 markdown 符號以外的內容：
@@ -68,14 +69,17 @@ def call_gemini(prompt: str) -> str:
         headers={"Content-Type": "application/json"},
         method="POST"
     )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        data = json.loads(resp.read().decode("utf-8"))
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8")
+        raise RuntimeError(f"Gemini API 錯誤 {e.code}: {body}") from e
 
     return data["candidates"][0]["content"]["parts"][0]["text"]
 
 
 def send_to_discord(message: str) -> None:
-    # Discord has a 2000 char limit per message; split if needed
     chunks = [message[i:i+1990] for i in range(0, len(message), 1990)]
     for chunk in chunks:
         payload = json.dumps({"content": chunk}).encode("utf-8")
@@ -85,14 +89,20 @@ def send_to_discord(message: str) -> None:
             headers={"Content-Type": "application/json"},
             method="POST"
         )
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            status = resp.getcode()
+        try:
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                status = resp.getcode()
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8")
+            raise RuntimeError(f"Discord Webhook 錯誤 {e.code}: {body}") from e
+
         if status not in (200, 204):
             raise RuntimeError(f"Discord webhook returned {status}")
 
 
 def main():
     print(f"[{datetime.now().isoformat()}] Agent 啟動...")
+    print("使用模型：gemini-1.5-flash-latest")
     print("呼叫 Gemini API 搜尋新聞...")
     message = call_gemini(PROMPT)
     print("新聞內容已產生，傳送至 Discord...")
