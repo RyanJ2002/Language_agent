@@ -60,41 +60,6 @@ PROMPT = f"""今天是 {today}（星期{weekday}）。
 
 _由語言學習 Agent 自動生成_"""
 
-VOCAB_PROMPT = f"""今天是 {today}（星期{weekday}）。
-
-請幫我各列出 5 個日語和韓語的基礎高頻單字，格式如下，不要任何額外說明：
-
-📚 **{today} 今日基礎單字**
-━━━━━━━━━━━━━━━━━━━━
-
-🇯🇵 **日語 N5 高頻單字**
-1. `単語`（romaji）＝ 中文意思
-   例句：日文例句（中文翻譯）
-2. `単語`（romaji）＝ 中文意思
-   例句：日文例句（中文翻譯）
-3. `単語`（romaji）＝ 中文意思
-   例句：日文例句（中文翻譯）
-4. `単語`（romaji）＝ 中文意思
-   例句：日文例句（中文翻譯）
-5. `単語`（romaji）＝ 中文意思
-   例句：日文例句（中文翻譯）
-
-🇰🇷 **韓語 TOPIK 初級高頻單字**
-1. `단어`（romaji）＝ 中文意思
-   例句：韓文例句（中文翻譯）
-2. `단어`（romaji）＝ 中文意思
-   例句：韓文例句（中文翻譯）
-3. `단어`（romaji）＝ 中文意思
-   例句：韓文例句（中文翻譯）
-4. `단어`（romaji）＝ 中文意思
-   例句：韓文例句（中文翻譯）
-5. `단어`（romaji）＝ 中文意思
-   例句：韓文例句（中文翻譯）
-
-━━━━━━━━━━━━━━━━━━━━
-💡 把今天的單字抄進你的 Flashcard App！
-
-_由語言學習 Agent 自動生成_"""
 
 def call_gemini(prompt: str) -> str:
     payload = json.dumps({
@@ -171,11 +136,6 @@ def main():
     news = call_gemini(PROMPT)
     print("新聞內容已產生，傳送至 Discord...")
     send_to_discord(news)
-
-    print("呼叫 Gemini API 產生單字...")
-    vocab = call_gemini(VOCAB_PROMPT)
-    print("單字內容已產生，傳送至 Discord...")
-    send_to_discord(vocab)
 
     print("✅ 完成！")
 
